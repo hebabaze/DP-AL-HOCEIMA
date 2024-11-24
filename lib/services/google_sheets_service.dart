@@ -424,9 +424,12 @@ String normalizeMobile(String mobile) {
 Future<ServiceAccountCredentials> loadCredentials() async {
   final credentialsJson = Platform.environment['GOOGLE_CREDENTIALS'];
   if (credentialsJson == null || credentialsJson.isEmpty) {
+    log("GOOGLE_CREDENTIALS not found.");
     throw Exception("Missing credentials!");
   }
+  log("GOOGLE_CREDENTIALS loaded successfully.");
   return ServiceAccountCredentials.fromJson(jsonDecode(credentialsJson));
 }
+
 
 }
