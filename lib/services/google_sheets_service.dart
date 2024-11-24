@@ -54,7 +54,7 @@ Future<void> _initialize({int maxRetries = 3, Duration delay = const Duration(se
       await _initialize();}}
 
   Future<ServiceAccountCredentials> _loadServiceAccountCredentials() async {
-    final credentialsJson = await rootBundle.loadString('assets/credentials.json');
+    final credentialsJson = await loadCredentials();
     return ServiceAccountCredentials.fromJson(credentialsJson);
   }
 Future<List<Map<String, dynamic>>> loadData(String sheetName) async {
