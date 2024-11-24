@@ -41,7 +41,6 @@ flutter:
     - assets/data/contacts_lycee.json
     - assets/data/contacts_services.json
     - assets/data/contacts_inspectors.json
-    - assets/credentials.json
 
   fonts:
     - family: "4_3D"
