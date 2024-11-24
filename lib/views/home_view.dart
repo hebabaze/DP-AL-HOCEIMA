@@ -36,7 +36,7 @@ class _HomeViewState extends State<HomeView> {
 Future<void> _updateData() async {
   setState(() {
     _isLoading = true;
-    _progressMessage = "... جاري التحقق من البيانات"; // Display progress message immediately
+    _progressMessage = "... جار التحقق من البيانات"; // Display progress message immediately
     _message = null;
   });
 

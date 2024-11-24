@@ -2,8 +2,7 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:dphoc/services/google_sheets_service.dart'; // Import GoogleSheetsService
-import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter/services.dart';
+import 'package:dphoc/utils/contact_options.dart'; // Import ContactOptions
 
 class SchoolContactsView extends StatefulWidget {
   final String sheetName;
@@ -83,259 +82,6 @@ class _SchoolContactsViewState extends State<SchoolContactsView> {
         return Icons.block_rounded; // Icône par défaut
     }
   }
-
-  void _showContactOptions(BuildContext context, String contactName, String mobile) {
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: false, // Empêche la fermeture en cliquant en dehors
-      barrierLabel: 'Contact Options',
-      transitionDuration: const Duration(milliseconds: 300),
-      pageBuilder: (context, anim1, anim2) {
-        return const SizedBox.shrink(); // Nécessaire mais non utilisé
-      },
-      transitionBuilder: (context, anim1, anim2, child) {
-        return Transform.scale(
-          scale: anim1.value,
-          child: Opacity(
-            opacity: anim1.value,
-            child: _buildContactDialog(context, contactName, mobile),
-          ),
-        );
-      },
-    );
-  }
-
-Widget _buildContactDialog(BuildContext context, String contactName, String mobile) {
-  return Dialog(
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(20), // Coins plus arrondis
-    ),
-    child: Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Colors.white,  Color.fromARGB(255, 189, 205, 101)], // Dégradé blanc à gris clair
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 15,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start, // Alignement des boutons à gauche
-        children: [
-          // Titre avec séparateur
-          Center(
-            child: Column(
-              children: [
-                Text(
-                  contactName,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 24, // Augmentation de la taille du texte
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black, // Texte en noir
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Container(
-                  width: 100,
-                  height: 3,
-                  color: const Color.fromARGB(255, 13, 16, 212), // Séparateur en noir
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-          // Boutons alignés à gauche
-          _buildAlignedButton(
-            icon: Icons.call,
-            label: "Appeler",
-            gradient: const LinearGradient(
-              colors: [Color.fromARGB(255, 196, 206, 211), Color.fromARGB(48, 137, 182, 150)], // Bleu doux
-            ),
-            textColor: Colors.black, // Texte en noir
-            onPressed: () {
-              _makePhoneCall(mobile); // Fonctionnalité d'appel
-            },
-          ),
-          const SizedBox(height: 10),
-          _buildAlignedButton(
-            label: "WhatsApp",
-            gradient: const LinearGradient(
-              colors: [Color.fromARGB(255, 241, 231, 29), Color(0xFF81C784)], // Vert doux
-            ),
-            textColor: Colors.black, // Texte en noir
-            onPressed: () {
-              _openWhatsApp(mobile); // Fonctionnalité WhatsApp
-            },
-            iconImagePath: 'assets/images/wtsp.png', // Image personnalisée pour WhatsApp
-          ),
-          const SizedBox(height: 10),
-          _buildAlignedButton(
-            icon: Icons.copy,
-            label: "Copier le numéro",
-            gradient: const LinearGradient(
-              colors: [Color(0xFFFFCCBC), Color(0xFFFFAB91)], // Orange clair
-            ),
-            textColor: Colors.black, // Texte en noir
-            onPressed: () {
-              _copyToClipboard(mobile); // Fonctionnalité de copie
-            },
-          ),
-          const SizedBox(height: 20),
-          // Bouton Fermer centré
-          Center(
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Fermer le dialogue
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 250, 31, 31), // Fond rouge doux
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8), // Réduction de la hauteur
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                elevation: 5,
-              ),
-              child: const Text(
-                "Fermer",
-                style: TextStyle(
-                  color: Colors.white, // Texte en blanc pour contraste
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
-Widget _buildAlignedButton({
-  IconData? icon,
-  String? iconImagePath,
-  required String label,
-  required Gradient gradient,
-  required Color textColor,
-  required VoidCallback onPressed,
-}) {
-  return Container(
-    decoration: BoxDecoration(
-      gradient: gradient,
-      borderRadius: BorderRadius.circular(10),
-    ),
-    child: MaterialButton(
-      onPressed: onPressed,
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min, // Ajuste la largeur pour couvrir le contenu uniquement
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          if (iconImagePath != null)
-            Image.asset(iconImagePath, height: 24, width: 24)
-          else if (icon != null)
-            Icon(icon, color: textColor),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: TextStyle(
-              color: textColor,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
-
-  /// Méthode pour construire un bouton d'option avec dégradé et icône
-  Widget _buildOptionButton({
-    required IconData icon,
-    required String label,
-    required Gradient gradient,
-    required VoidCallback onPressed,
-    required Color textColor,
-    bool isIconImage = false,
-    String? iconImagePath,
-  }) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: gradient,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: ElevatedButton.icon(
-        icon: isIconImage
-            ? Image.asset(
-                iconImagePath!,
-                height: 24,
-                width: 24,
-                // Supprimer le filtre de couleur si vous souhaitez conserver les couleurs originales de l'image
-              )
-            : Icon(icon, color: Colors.black), // Icône en noir
-        label: Text(
-          label,
-          style: TextStyle(
-            color: textColor, // Couleur du texte spécifiée
-            fontWeight: FontWeight.bold,
-            fontSize: 18, // Augmentation de la taille du texte
-          ),
-        ),
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent, // Transparent pour montrer le dégradé
-          shadowColor: Colors.transparent,
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10), // Réduction de la hauteur
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Fonctions originales sans modifications
-  void _makePhoneCall(String mobile) {
-    final Uri url = Uri(scheme: 'tel', path: mobile);
-    launchUrl(url);
-  }
-
-  void _openWhatsApp(String mobile) {
-    final Uri url = Uri.parse("https://wa.me/212${mobile.substring(1)}");
-    launchUrl(url);
-  }
-
-  // Méthode pour copier le numéro de téléphone dans le presse-papiers
-  void _copyToClipboard(String mobile) {
-    Clipboard.setData(ClipboardData(text: mobile));
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("تم نسخ الرقم إلى الحافظة")),
-    );
-  }
-
   // Méthode pour mettre en évidence le texte correspondant à la recherche
   RichText _highlightText(String text, String query, {bool isBold = false}) {
     if (query.isEmpty) {
@@ -475,30 +221,15 @@ Widget build(BuildContext context) {
                                 _highlightText("المدير(ة): $nom", _searchQuery), // nom sans gras
                               ],
                             ),
-                            trailing: IconButton(
-                              icon: Icon(_getCycleIconBySheet(widget.sheetName), color: widget.iconColor),
-                              onPressed: () {
-                                _showContactOptions(context, etab, mobile);
-                              },
+                          trailing: IconButton(
+                            icon: Icon(
+                              _getCycleIconBySheet(widget.sheetName),
+                              color: widget.iconColor,
                             ),
-                            leading: IconButton(
-                              icon: const Icon(Icons.more_vert), // Trois points verticaux
-                              color: widget.iconColor, // Appliquer la même couleur que l'icône principale
-                              onPressed: () {
-                                _showContactOptions(context, etab, mobile);
-                              },
-                            ),
-                            onTap: () {
-                              _showContactOptions(context, etab, mobile);
+                            onPressed: () {
+                              ContactOptions.show(context, etab, mobile); // Utilisation de ContactOptions
                             },
                           ),
-                        );
-                      },
-                    ),
-                  ),
-      ],
-    ),
-  );
-}
-
-}
+                          onTap: () {
+                            ContactOptions.show(context, etab, mobile); // Utilisation de ContactOptions
+                          },),);},), ),],),);}}
