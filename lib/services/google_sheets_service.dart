@@ -420,9 +420,10 @@ String normalizeMobile(String mobile) {
   // Pad with zeros to ensure a length of 10
   return mobile.padLeft(10, '0');
 }
+
 Future<ServiceAccountCredentials> loadCredentials() async {
-  final credentialsJson = const String.fromEnvironment('GOOGLE_CREDENTIALS');
-  if (credentialsJson.isEmpty) {
+  final credentialsJson = Platform.environment['GOOGLE_CREDENTIALS'];
+  if (credentialsJson == null || credentialsJson.isEmpty) {
     throw Exception("Missing credentials!");
   }
   return ServiceAccountCredentials.fromJson(jsonDecode(credentialsJson));
