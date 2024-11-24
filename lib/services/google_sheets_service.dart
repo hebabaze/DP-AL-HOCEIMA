@@ -420,5 +420,14 @@ String normalizeMobile(String mobile) {
   // Pad with zeros to ensure a length of 10
   return mobile.padLeft(10, '0');
 }
+import 'dart:convert';
+
+Future<ServiceAccountCredentials> loadCredentials() async {
+  final credentialsJson = const String.fromEnvironment('GOOGLE_CREDENTIALS');
+  if (credentialsJson.isEmpty) {
+    throw Exception("Missing credentials!");
+  }
+  return ServiceAccountCredentials.fromJson(jsonDecode(credentialsJson));
+}
 
 }
